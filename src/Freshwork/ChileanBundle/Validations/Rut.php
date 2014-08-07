@@ -20,7 +20,7 @@ class Rut {
      *
      * @var array
      */
-    public static $scape_chars = [".",",","-"];
+    public static $scape_chars = [".",",","-","_"];
 
     /**
      * @var string
@@ -36,6 +36,8 @@ class Rut {
      * @var int
      */
     public static $max_chars = 9;
+
+    public static $use_exceptions = true;
 
     /**
      *
@@ -63,7 +65,8 @@ class Rut {
     static public function isValid($rut,$dv = null){
         list($rut,$dv) = static::split($rut,$dv);
 
-        static::hasValidFormat($rut,$dv);
+        if(!static::hasValidFormat($rut,$dv))
+            return false;
 
         $dv_has_to_be = static::getVerificationNumber($rut);
 
@@ -96,7 +99,8 @@ class Rut {
      * @return string
      */
     static public function getVerificationNumber($r,$has_to_remove_last_char = false){
-        if($has_to_remove_last_char)return substr($r,-1);
+        $r = static::normalize($r);
+        if($has_to_remove_last_char)$r = substr($r,0,-1);
 
         $s=1;
         for($m=0;$r!=0;$r/=10)
@@ -118,8 +122,8 @@ class Rut {
         $rut = static::normalize($rut);
 
         if(!is_null($dv))
-            return [(int)$rut,(int)$dv];
-        $dv = (int)substr($rut,-1);//Get the last character
+            return [(int)$rut,strtoupper($dv)];
+        $dv = strtoupper(substr($rut,-1));//Get the last character
         $rut = (int)substr($rut,0,-1); //Remove tha last char from the rut
 
         return [$rut,$dv];
@@ -146,7 +150,7 @@ class Rut {
     static public function format($rut,$dv=null,$format = 0){
         list($rut,$dv) = static::split($rut,$dv);
 
-        static::hasValidFormat($rut,$dv);
+        if(!static::hasValidFormat($rut,$dv))return false;
 
         switch($format)
         {
@@ -170,12 +174,19 @@ class Rut {
      * @param $rut
      * @param null $dv
      * @throws \Freshwork\ChileanBundle\Exceptions\InvalidFormatException
+     *
+     * @return bool
      */
     static public function hasValidFormat($rut,$dv = null){
         list($rut,$dv) = static::split($rut,$dv);
-        $is_ok = (preg_match('/^[0-9]+$/', $rut) && preg_match('/([kK0-9])$/',$dv) && strlen($rut)>static::$min_chars && strlen($rut)<static::$max_chars);
+        $is_ok = (preg_match('/^[0-9]+$/', $rut) && preg_match('/([K0-9])$/',$dv) && strlen($rut)>static::$min_chars && strlen($rut)<static::$max_chars);
+
+        if(!static::$use_exceptions)return $is_ok;
+
         if(!$is_ok)
             throw new InvalidFormatException("R.U.T. '{$rut}' with verification code '{$dv}' has an invalid format");
+
+        return true;
     }
 
     /**

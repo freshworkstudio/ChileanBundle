@@ -23,7 +23,7 @@ class RutUtilsTest extends \Codeception\TestCase\Test
     {
         $ruts = [
             'valid'    => ['11.111.111-1','111111111','11111112-K','11111112-k'],
-            'invalid'  => ['11111112-9','12345-5','123-1','123.456.789-2']
+            'invalid'  => ['11111112-9','1234k678-3','123-1','123.456.789-2','11.111.111-L']
         ];
 
         /***********************
@@ -66,17 +66,33 @@ class RutUtilsTest extends \Codeception\TestCase\Test
             $this->assertEquals('Freshwork\ChileanBundle\Exceptions\InvalidFormatException',get_class($e));
         }
 
+        try{
+            Rut::validate( $ruts['invalid'][4] );
+            $this->assertTrue(false);
+        }catch (\Exception $e){
+            $this->assertEquals('Freshwork\ChileanBundle\Exceptions\InvalidFormatException',get_class($e));
+        }
+
+        /***********************
+         * TEST  invalid RUT without exceptions.
+         *********************/
+        Rut::$use_exceptions = false;
+        $this->assertFalse(Rut::validate( $ruts['invalid'][1],null,true),$ruts['invalid'][1]);
+        $this->assertFalse(Rut::validate( $ruts['invalid'][2],null,true),$ruts['invalid'][2]);
+        $this->assertFalse(Rut::validate( $ruts['invalid'][3],null,true),$ruts['invalid'][3]);
+        Rut::$use_exceptions = true;
+
         /***********************
          * TEST Rut::getVerificationNumber()
          *********************/
-        $this->assertEquals( Rut::getVerificationNumber('1.23.4.567-8-9')       , '9');
-        $this->assertEquals( Rut::getVerificationNumber('1.23.4.567-8-K',true)  , 'K');
+        $this->assertEquals( Rut::getVerificationNumber('11.111.111')           , '1');
+        $this->assertEquals( Rut::getVerificationNumber('1.23.4.567-8-K',true)  , '5');
 
         /***********************
          * TEST Rut::format()
          *********************/
         $this->assertEquals(Rut::format('1.23.4.567-8-9'), '12.345.678-9','FORMAT_COMPLETE');
-        $this->assertEquals(Rut::format('1.23.4.567-8-9',null,RUT::FORMAT_COMPLETE),     '12.345.678-9','FORMAT_COMPLETE');
+        $this->assertEquals(Rut::format('1.23.4.567-8-K',null,RUT::FORMAT_COMPLETE),     '12.345.678-K','FORMAT_COMPLETE');
         $this->assertEquals(Rut::format('1.23.4.567-8-9',null,RUT::FORMAT_WITH_DASH),    '12345678-9','FORMAT_WITH_DASH');
         $this->assertEquals(Rut::format('1.23.4.567-8-9',null,RUT::FORMAT_ESCAPED),      '123456789','FORMAT_ESCAPED');
 
