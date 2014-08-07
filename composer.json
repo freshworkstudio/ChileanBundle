@@ -7,11 +7,10 @@
             "email": "gonzalo@freshworkstudio.com"
         }
     ],
-    "keywors":["laravel","chile","rut","freshwork","validation","tools"],
+    "keywors":["chile","rut","freshwork","validation","tools"],
     "license":"GPLv3",
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/support": "4.2.*"
+        "php": ">=5.4.0"
     },
     "require-dev": {
         "codeception/codeception": "~2.0"
