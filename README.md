@@ -15,26 +15,71 @@ Installation
 ------------
 
 ### with composer: 
+**1.A)** Edit your composer.json and add the package: 
+
     {
         "require": {
             "freshwork\chilean-bundle": "dev-master"
         }
     }
+    
 
-Or running this command:
+**1.B)** Or... running this command:
 ```bash
     composer require freshwork\chilean-bundle dev-master
 ```
+
+**2)** Run composer install or update
+```bash
+php composer update
+```
+
+**3.A)** Using Laravel?
+Just add this to your $providers array at app/config/app.php
+```php
+//app/config/app.php
+
+$providers = array(
+    //...
+    'Freshwork\ChileanBundle\Laravel\ChileanBundleServiceProvider'
+);
+
+//NOW YOU CAN ACCESS WITH RUT FACADE IN ANY FILE OF YOUR APP
+
+Rut::validate('10.123.123-5'); //return false
+Rut::validate('10.123.123-5'); //return false
+Rut::validate('12.345.678','5');//return true
+Rut::format('123456789'); //return '12.345.678-9
+//etc...
+
+```
+
+**3.B)** Not using Laravel: 
+
+```php
+<?php 
+include('vendor/autoload.php'); //Enable composer autloading
+
+//You have to declare: 
+use Freshwork\ChileanBundle\Validation\Rut;
+
+Rut::validate('10.123.123-5'); //return false
+Rut::validate('10.123.123-5'); //return false
+Rut::validate('12.345.678','5');//return true
+Rut::format('123456789'); //return '12.345.678-9
+//etc...
+```
+
+### We're ready to roll ;)
 
 Checkout this link for packagist: [Link]
 
 
 
-RUT FUNCTIONS
------
+### HOW TO USE: Chilean R.U.T. functions
 
----
----
+
+
 
 ### isValid($rut [,$digito_verificador = null]) or
 ### validate($rut [,$digito_verificador = null])
