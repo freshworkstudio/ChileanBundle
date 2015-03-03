@@ -20,7 +20,12 @@ class Rut {
      *
      * @var array
      */
-    public static $scape_chars = [".",",","-","_"];
+    public static $scape_chars = [".",",","-","_"," ","\n","\r"];
+
+    /**
+     * @var string
+     */
+    public static $regex = '/([^0-9kK])/';
 
     /**
      * @var string
@@ -37,6 +42,9 @@ class Rut {
      */
     public static $max_chars = 9;
 
+    /**
+     * @var bool
+     */
     public static $use_exceptions = true;
 
     /**
