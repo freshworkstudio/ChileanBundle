@@ -1,8 +1,8 @@
 <?php namespace Freshwork\ChileanBundle\Laravel;
 
 use App;
-use Freshwork\ChileanBundle\Validations\Rut;
-use Illuminate\Foundation\AliasLoader;
+use Freshwork\ChileanBundle\Rut;
+use Illuminate\Support\ServiceProvider;
 use Validator;
 
 class ChileanBundleServiceProvider extends ServiceProvider {
@@ -27,8 +27,7 @@ class ChileanBundleServiceProvider extends ServiceProvider {
     public function boot(){
         Validator::extend('cl_rut', function($attribute, $value, $parameters)
         {
-            Rut::quiet();
-            return Rut::validate($value);
+            return Rut::parse($value)->quiet()->validate();
         });
 
 
