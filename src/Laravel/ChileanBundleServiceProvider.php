@@ -1,8 +1,9 @@
 <?php namespace Freshwork\ChileanBundle\Laravel;
 
+use App;
 use Freshwork\ChileanBundle\Validations\Rut;
 use Illuminate\Foundation\AliasLoader;
-use Illuminate\Support\ServiceProvider;
+use Validator;
 
 class ChileanBundleServiceProvider extends ServiceProvider {
 
@@ -24,27 +25,18 @@ class ChileanBundleServiceProvider extends ServiceProvider {
 	}
 
     public function boot(){
-        \Validator::extend('cl_rut', function($attribute, $value, $parameters)
+        Validator::extend('cl_rut', function($attribute, $value, $parameters)
         {
-            Rut::$use_exceptions = false;
+            Rut::quiet();
             return Rut::validate($value);
         });
 
-        \App::bind('rut', function()
+
+        app()->bind('rut', function()
         {
             return new Rut;
         });
-        //Automatically alias the package.
-        $current_aliases = \Config::get("app.aliases");
 
-        //Get the alias loader instance. Ready to add aliases...
-        $loader = AliasLoader::getInstance();
-
-        //Add Sentry Facade Alias if is not already set on app/config/app.php
-        if (empty($aliases['Rut']))
-        {
-            $loader->alias('Rut', 'Freshwork\ChileanBundle\Facades\Rut');
-        }
     }
 
 	/**
