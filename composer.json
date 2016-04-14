@@ -1,5 +1,6 @@
 {
     "name": "freshwork/chilean-bundle",
+    "version": "2.0",
     "description": "A PHP composer package with Chilean validations, common variables, etc. (RUT, IVA, ETC). Ready for Laravel 4. Grande chile ctm :)",
     "authors": [
         {
@@ -7,7 +8,7 @@
             "email": "gonzalo@freshworkstudio.com"
         }
     ],
-    "keywords":["chile", "rut", "freshwork", "validation", "tools"],
+    "keywords":["chile", "rut", "freshwork", "validation", "tools", "laravel"],
     "license":"MIT",
     "require": {
         "php": ">=5.4.0"

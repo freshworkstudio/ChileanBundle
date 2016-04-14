@@ -15,7 +15,7 @@ Viva Chile Mierda!
 From the command line, run:
 
 ```
-composer require freshwork\chilean-bundle:2.*
+composer require freshwork/chilean-bundle:2.*
 ```
 If you're not using Laravel, you are done.
 
@@ -23,8 +23,18 @@ If you're not using Laravel, you are done.
 
 Append this line to your `providers` array in your  `config/app.php` file:
 
+```php
+'providers' => [
+    ...
+    Freshwork\ChileanBundle\Laravel\ChileanBundleServiceProvider::class
+];
 ```
-Freshwork\ChileanBundle\Laravel\ChileanBundleServiceProvider::class
+and you can add the `RUT` Facade
+```php
+'aliases' => [
+    ...
+    'Rut'   => 'Freshwork\ChileanBundle\Laravel\Facades\Rut::class'
+];
 ```
 ## Usage
 
