@@ -1,4 +1,4 @@
-<?php namespace Freshwork\ChileanBundle\Facades;
+<?php namespace Freshwork\ChileanBundle\Laravel\Facades;
 /**
  * Author: Gonzalo De Spirito
  * Email: gonzalo@freshworkstudio.com
