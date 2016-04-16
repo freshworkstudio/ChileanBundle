@@ -212,7 +212,7 @@ for($i = 0; $i < 10; $i++)
 ``` 
 ---
 # Testing
-You can run the tests as `./vendor/bin/codecept run``
+You can run the tests as `./vendor/bin/codecept run`
 
 ---
 # Contributing

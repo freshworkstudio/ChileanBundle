@@ -12,14 +12,6 @@ class RutTest extends \Codeception\TestCase\Test
     protected $tester;
     private $ruts;
 
-    protected function _before()
-    {
-    }
-
-    protected function _after()
-    {
-    }
-
     // tests
     public function testValidation()
     {
