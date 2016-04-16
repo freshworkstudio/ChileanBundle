@@ -33,7 +33,7 @@ and you can add the `RUT` Facade
 ```php
 'aliases' => [
     ...
-    'Rut'   => 'Freshwork\ChileanBundle\Laravel\Facades\Rut::class'
+    'Rut'   => Freshwork\ChileanBundle\Laravel\Facades\Rut::class
 ];
 ```
 ## Usage
@@ -168,6 +168,8 @@ class ClientController extends Controller{
 #Examples
 RUT Generator
 ```php 
+<?php
+
 use \Freshwork\ChileanBundle\Rut;
 
 //We loop 100 times
@@ -199,6 +201,7 @@ This generatos 10 random RUT's between 1.000.000 and 25.000.000
 
 Even a shorter sintaxis: 
 ```php
+<?php
 for($i = 0; $i < 10; $i++)
     echo \Freshwork\ChileanBundle\Rut::set(rand(1000000, 25000000))->fix()->format() . "\n";
 ``` 
