@@ -97,6 +97,8 @@ Rut::set('12.345.678')->calculateVerificationNumber(); //return 5
 Rut::set('12.345.678-9')->calculateVerificationNumber(); //return 5
 Rut::parse('12.345.678-9')->calculateVerificationNumber(); //return 5
 ```
+Esta clase se basa en está simple, pero eficiente función: 
+[http://www.dcc.uchile.cl/~mortega/microcodigos/validarrut/php.php](http://www.dcc.uchile.cl/~mortega/microcodigos/validarrut/php.php)
 
 ### The `format()` method
 Return the Rut object as string with a definied format.
