@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Validación de RUT Chileno en PHP  by freshworkstudio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Validación de RUT Chileno en PHP </h1>
+      <h2 class="project-tagline">Una librería de PHP para validar RUT y en el futuro, ser una caja de herramientas ara desarrolladores chilenos. </h2>
+      <a href="https://github.com/freshworkstudio/ChileanBundle" class="btn">View on GitHub</a>
+      <a href="https://github.com/freshworkstudio/ChileanBundle/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/freshworkstudio/ChileanBundle/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="validación-de-rut--chilean-bundle" class="anchor" href="#validaci%C3%B3n-de-rut--chilean-bundle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Validación de RUT | Chilean Bundle</h1>
+
+<p>Por el momento el paquete solo tiene una clase <code>Rut</code> que permite validar y trabajar con el RUT de manera simple. </p>
+
+<h3>
+<a id="documentación" class="anchor" href="#documentaci%C3%B3n" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Documentación</h3>
+
+<p>Puedes encontrar la documentación más completa en <a href="https://github.com/freshworkstudio/ChileanBundle">https://github.com/freshworkstudio/ChileanBundle</a></p>
+
+<h3>
+<a id="composer" class="anchor" href="#composer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Composer</h3>
+
+<p>Este paquete usa Composer para que sea más simple usarlo y mantener la clase actualizada, pero si lo deseas, puedes descargar el ZIP e instalarlo manualmente en tu proyecto. </p>
+
+<p>Más detalles en la <a href="https://getcomposer.org/">Página oficial de Composer</a></p>
+
+<p>Para usar composer de manera simple en tu flujo de trabajo. En la linea de comandos (terminadl/cmd): </p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-c">#Esto descarga composer.phar en la carpeta en que estás parado</span>
+php -r <span class="pl-s"><span class="pl-pds">"</span>readfile('https://getcomposer.org/installer');<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> composer-setup.php
+php -r <span class="pl-s"><span class="pl-pds">"</span>if (hash('SHA384', file_get_contents('composer-setup.php')) === '7228c001f88bee97506740ef0888240bd8a760b046ee16db8f4095c0d8d525f2367663f22a46b48d072c816e7fe19959') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;<span class="pl-pds">"</span></span>
+php composer-setup.php
+php -r <span class="pl-s"><span class="pl-pds">"</span>unlink('composer-setup.php');<span class="pl-pds">"</span></span>
+
+<span class="pl-c">#Esto copia el archivo a la carpeta /usr/local/bin/ para que esté dentro del path y puedas usar el comando composer globalmente (En windows debes copiarlo a una carpeta que esté dentro del PATH)</span>
+mv composer.phar /usr/local/bin/composer</pre></div>
+
+<h2>
+<a id="instalación-del-paquete" class="anchor" href="#instalaci%C3%B3n-del-paquete" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Instalación del paquete</h2>
+
+<h3>
+<a id="paso-1-composer" class="anchor" href="#paso-1-composer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Paso 1: Composer</h3>
+
+<p>Desde la terminal o cmd: </p>
+
+<pre><code>composer require freshwork/chilean-bundle:2.*
+</code></pre>
+
+<p>Si no usas laravel, estas listo.</p>
+
+<h3>
+<a id="paso-2-laravel-service-provider" class="anchor" href="#paso-2-laravel-service-provider" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Paso 2: Laravel Service Provider</h3>
+
+<p>Añade esta linea al array <code>providers</code> en tu archivo <code>config/app.php</code>:</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-s"><span class="pl-pds">'</span>providers<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
+<span class="pl-s1">    <span class="pl-k">...</span></span>
+<span class="pl-s1">    <span class="pl-c1">Freshwork\ChileanBundle\Laravel\</span><span class="pl-c1">ChileanBundleServiceProvider</span><span class="pl-k">::</span><span class="pl-c1">class</span></span>
+<span class="pl-s1">];</span></pre></div>
+
+<p>Y también puedes añadir el Facade: </p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-s"><span class="pl-pds">'</span>aliases<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
+<span class="pl-s1">    <span class="pl-k">...</span></span>
+<span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>Rut<span class="pl-pds">'</span></span>   <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Freshwork\ChileanBundle\Laravel\Facades\Rut::class<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">];</span></pre></div>
+
+<h2>
+<a id="uso-de-la-clase-rut" class="anchor" href="#uso-de-la-clase-rut" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Uso de la clase <code>RUT</code>
+</h2>
+
+<h3>
+<a id="lo-básico" class="anchor" href="#lo-b%C3%A1sico" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Lo básico</h3>
+
+<p>Puedes usar la clase RUT con <code>new Rut()</code> pero es más fácil si usas <code>Rut::parse($rut)</code></p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-k">include</span>(<span class="pl-s"><span class="pl-pds">'</span>vendor/autoload.php<span class="pl-pds">'</span></span>); <span class="pl-c">//Enable composer autloading if not using laravel</span></span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Freshwork\ChileanBundle\Rut</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$rut</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">Rut</span>(<span class="pl-s"><span class="pl-pds">'</span>11.111.111<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>1<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"><span class="pl-smi">$rut</span><span class="pl-k">-&gt;</span>validate(); <span class="pl-c">//true</span></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">(<span class="pl-k">new</span> <span class="pl-c1">Rut</span>(<span class="pl-s"><span class="pl-pds">'</span>12345678<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>5<span class="pl-pds">'</span></span>))<span class="pl-k">-&gt;</span>validate(); <span class="pl-c">//true</span></span>
+<span class="pl-s1"></span></pre></div>
+
+<p>Ve el resto de la documentación en <a href="https://github.com/freshworkstudio/ChileanBundle">https://github.com/freshworkstudio/ChileanBundle</a></p>
+
+<h2>
+<a id="ideas-y-aportes" class="anchor" href="#ideas-y-aportes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Ideas y aportes</h2>
+
+<p>Si se les ocurren ideas de otras funcionalidades que podamos implementar en el paquete, me avisan y lo revisaré! Podrái tener una clase para el IVA o la UF, y quizás otro tipo de cosas. </p>
+
+<h3>
+<a id="autor" class="anchor" href="#autor" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Autor</h3>
+
+<p>Puedes seguirme en github en <a href="https://github.com/gonzunigad" class="user-mention">@gonzunigad</a>. </p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/freshworkstudio/ChileanBundle">Validación de RUT Chileno en PHP </a> is maintained by <a href="https://github.com/freshworkstudio">freshworkstudio</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
