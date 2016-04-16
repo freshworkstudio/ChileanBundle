@@ -121,10 +121,15 @@ Rut::parse('12.345.678-5')->toArray(); //return ['12345678', '5']
 ```
 
 ### The `fix()` method
-Fix the current RUT.  It will change
+Fix the current RUT.  It will take the number part of the RUT (without verification number) and it will calculate what's the correct verification number for that RUT and then updates the verification number with this result. 
 ```php
 Rut::parse('12.345.678-9')->fix()->format(); //return '12.345.678-5'
+
+//Set a new rut without setting any verification number
 Rut::set('12345678')->fix()->format(); //return '12.345.678-5'
+
+//Set a new rut with an invalid verification number that will be replaced
+Rut::set('12345678', '6')->fix()->format(); //return '12.345.678-5'
 
 Rut::parse('12.345.678-9')->validate(); //return false
 Rut::parse('12.345.678-9')->fix()->validate(); //return true
@@ -159,6 +164,44 @@ class ClientController extends Controller{
     }
 }
 ```
+---
+#Examples
+RUT Generator
+```php 
+use \Freshwork\ChileanBundle\Rut;
+
+//We loop 100 times
+for($i = 0; $i < 10; $i++)
+{
+    //generate random number between 1.000.000 and 25.000.000
+    $random_number = rand(1000000, 25000000);
+
+    //We create a new RUT wihtout verification number (the second paramenter of Rut constructor)
+    $rut = new Rut($random_number);
+
+    //The fix method calculates the  
+    echo $rut->fix()->format() . " \n";
+}
+//Output (random)
+
+17.062.139-5
+18.815.969-9
+14.287.543-8
+13.864.006-K
+16.724.081-K
+20.465.345-3
+13.294.672-8
+11.102.906-7
+8.333.479-7
+7.661.557-8
+```
+This generatos 10 random RUT's between 1.000.000 and 25.000.000
+
+Even a shorter sintaxis: 
+```php
+for($i = 0; $i < 10; $i++)
+    echo \Freshwork\ChileanBundle\Rut::set(rand(1000000, 25000000))->fix()->format() . "\n";
+``` 
 ---
 # Testing
 You can run the tests as `./vendor/bin/codecept run``
