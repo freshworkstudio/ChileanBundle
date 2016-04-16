@@ -100,6 +100,7 @@ Rut::parse('12.345.678-9')->calculateVerificationNumber(); //return 5
 Esta clase se basa en está simple, pero eficiente función: 
 [http://www.dcc.uchile.cl/~mortega/microcodigos/validarrut/php.php](http://www.dcc.uchile.cl/~mortega/microcodigos/validarrut/php.php)
 
+
 ### The `format()` method
 Return the Rut object as string with a definied format.
 ```php
@@ -138,11 +139,13 @@ Rut::parse('12.345.678-9')->fix()->validate(); //return true
 ```
 
 ### The `vn()` and `number()` method
-You can set the RUT number and verification numer with this setters/getters. If no argumen are passed to this methods, it will retrn the corresponding value.
+You can set and get the RUT number and verification number with this methods. If no argumen are passed to this methods, it will return the corresponding value. Otherwise, it sets the value.
 ```php
+//Getter
 Rut::parse('12.345.678-9')->vn(); //return '9'
 Rut::parse('12.345.678-9')->number(); //return '12345678'
 
+//Setter
 Rut::parse('12.345.678-9')->vn('7')->format(); //return '12.345.678-7'
 Rut::parse('12.345.678-9')->number('11111111')->format(); //return '11.111.111-9'
 Rut::set()->number('12.345.678')->vn('9')->format() //return '12.345.678-9'
