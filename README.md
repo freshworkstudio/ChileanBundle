@@ -15,7 +15,7 @@ Viva Chile Mierda!
 From the command line, run:
 
 ```
-composer require freshwork/chilean-bundle:^2.0
+composer require freshwork/chilean-bundle 
 ```
 If you're not using Laravel, you are done.
 
