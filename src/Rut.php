@@ -141,7 +141,7 @@ class Rut {
     {
         if ($number !== null)
         {
-            $this->number = intval($this->escape($number));
+            $this->number = $this->escape($number);
             return $this;
         }
         return $this->number;
