@@ -1,24 +1,43 @@
 {
-    "name": "freshwork/chilean-bundle",
-    "description": "A PHP composer package with Chilean validations, common variables, etc. (RUT, IVA, ETC). Ready for Laravel 4. Grande chile ctm :)",
-    "authors": [
-        {
-            "name": "Gonzalo De Spirito | Freshwork Studio Chile",
-            "email": "gonzalo@freshworkstudio.com"
-        }
-    ],
-    "keywords":["chile", "rut", "freshwork", "validation", "tools", "laravel"],
-    "license":"MIT",
-    "require": {
-        "php": ">=5.4.0"
+  "name": "freshwork/chilean-bundle",
+  "description": "A PHP composer package with Chilean validations, common variables, etc. (RUT, IVA, ETC). Ready for Laravel 4. Grande chile ctm :)",
+  "authors": [
+    {
+      "name": "Gonzalo De Spirito | Freshwork Studio Chile",
+      "email": "gonzalo@freshworkstudio.com"
     },
-    "require-dev": {
-        "codeception/codeception": "^2.1",
-        "codeception/specify": "^0.4.3"
-    },
-    "autoload": {
-        "psr-4": {
-            "Freshwork\\ChileanBundle\\": "src/"
-        }
+    {
+      "name": "Eduardo Aguad",
+      "email": "eduaguad@gmail.com"
     }
+  ],
+  "keywords": [
+    "chile",
+    "rut",
+    "freshwork",
+    "validation",
+    "tools",
+    "laravel"
+  ],
+  "license": "MIT",
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "require-dev": {
+    "codeception/codeception": "^2.1",
+    "codeception/specify": "^0.4.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Freshwork\\ChileanBundle\\": "src/"
+    }
+  },
+  "laravel": {
+    "providers": [
+      "Freshwork\\ChileanBundle\\Laravel\\ChileanBundleServiceProvider"
+    ],
+    "aliases": {
+      "Rut": "Freshwork\\ChileanBundle\\Facades\\Rut"
+    }
+  }
 }

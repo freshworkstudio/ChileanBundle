@@ -21,6 +21,10 @@ If you're not using Laravel, you are done.
 
 ### Step 2: Laravel Service Provider
 
+If you're using **Laravel 5.5** this package supports Auto-Discovery. So you can skip this step.
+
+**For Laravel 5.4 or below**
+
 Append this line to your `providers` array in your  `config/app.php` file:
 
 ```php
