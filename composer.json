@@ -32,12 +32,14 @@
       "Freshwork\\ChileanBundle\\": "src/"
     }
   },
-  "laravel": {
-    "providers": [
-      "Freshwork\\ChileanBundle\\Laravel\\ChileanBundleServiceProvider"
-    ],
-    "aliases": {
-      "Rut": "Freshwork\\ChileanBundle\\Facades\\Rut"
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Freshwork\\ChileanBundle\\Laravel\\ChileanBundleServiceProvider"
+      ],
+      "aliases": {
+        "Rut": "Freshwork\\ChileanBundle\\Facades\\Rut"
+      }
     }
   }
 }
