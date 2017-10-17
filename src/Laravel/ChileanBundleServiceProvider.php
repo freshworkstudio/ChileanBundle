@@ -37,10 +37,6 @@ class ChileanBundleServiceProvider extends ServiceProvider
             return Rut::parse($value)->quiet()->validate();
         });
 
-        Validator::replacer('cl_rut', function ($message, $attribute, $rule, $parameters) {
-            return str_replace('El atributo :attribute es inválido', $parameters[0], $message);
-        });
-
         app()->bind('rut', function () {
             return new Rut;
         });
