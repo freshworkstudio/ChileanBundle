@@ -174,7 +174,7 @@ class ClientController extends Controller{
 }
 ```
 ---
-#Examples
+# Examples
 RUT Generator
 ```php 
 <?php
@@ -206,9 +206,9 @@ for($i = 0; $i < 10; $i++)
 8.333.479-7
 7.661.557-8
 ```
-This generatos 10 random RUT's between 1.000.000 and 25.000.000
+This generates ten random RUT's between 1.000.000 and 25.000.000
 
-Even a shorter sintaxis: 
+Even a shorter syntaxis: 
 ```php
 <?php
 for($i = 0; $i < 10; $i++)
