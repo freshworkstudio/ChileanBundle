@@ -45,7 +45,7 @@ class Rut
      * Max amount of chars a RUT can have beign normalized (without dashes or spaces)
      * @var int
      */
-    protected $maxChars = 9;
+    protected $maxChars = 10;
 
     /**
      * Determines if the class throws exceptions on validations errors
