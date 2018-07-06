@@ -1,4 +1,5 @@
 <?php namespace Freshwork\ChileanBundle\Laravel\Facades;
+
 /**
  * Author: Gonzalo De Spirito
  * Email: gonzalo@freshworkstudio.com
@@ -7,7 +8,10 @@
 
 use Illuminate\Support\Facades\Facade;
 
-class Rut extends Facade {
-    protected static function getFacadeAccessor() { return 'rut'; }
-
+class Rut extends Facade
+{
+    protected static function getFacadeAccessor()
+    {
+        return 'rut';
+    }
 }

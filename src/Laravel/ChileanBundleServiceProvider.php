@@ -22,7 +22,6 @@ class ChileanBundleServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
     }
 
     public function boot()
@@ -51,5 +50,4 @@ class ChileanBundleServiceProvider extends ServiceProvider
     {
         return array();
     }
-
 }

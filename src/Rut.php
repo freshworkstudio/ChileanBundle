@@ -1,4 +1,5 @@
 <?php namespace Freshwork\ChileanBundle;
+
 /**
  * Author: Gonzalo De Spirito
  * Email: gonzalo@freshworkstudio.com
@@ -11,7 +12,8 @@ use Freshwork\ChileanBundle\Exceptions\InvalidFormatException;
  * Validation and Utils for RUT
  * @package Freshwork\ChileanBundle
  */
-class Rut {
+class Rut
+{
 
     /**
      * Characters to scape from RUT
@@ -20,7 +22,7 @@ class Rut {
      *
      * @var array
      */
-    protected $scape_chars = [".", ",", "-", "_", " "];
+    protected $escapeChars = [".", ",", "-", "_", " "];
 
     /**
      * @var string
@@ -37,19 +39,19 @@ class Rut {
      * Min amount of chars a RUT can have beign normalized (without dashes or spaces)
      * @var int
      */
-    protected $min_chars = 5;
+    protected $minChars = 5;
 
     /**
      * Max amount of chars a RUT can have beign normalized (without dashes or spaces)
      * @var int
      */
-    protected $max_chars = 9;
+    protected $maxChars = 9;
 
     /**
      * Determines if the class throws exceptions on validations errors
      * @var bool
      */
-    protected $use_exceptions = true;
+    protected $useExceptions = true;
 
     /**
      * RUT Number
@@ -86,9 +88,12 @@ class Rut {
      */
     public function __construct($rut = null, $vn = null)
     {
-
-        if ($rut != null) $this->number($rut);
-        if ($vn !== null) $this->vn($vn);
+        if ($rut != null) {
+            $this->number($rut);
+        }
+        if ($vn !== null) {
+            $this->vn($vn);
+        }
     }
 
     /**
@@ -97,9 +102,9 @@ class Rut {
      * @param string|integer $rut Rut Number with the verification number
      * @return Rut
      */
-    static public function parse($rut)
+    public static function parse($rut)
     {
-        list ($rut, $vn) = self::split($rut);
+        list($rut, $vn) = self::split($rut);
 
         return (new self($rut, $vn));
     }
@@ -111,7 +116,7 @@ class Rut {
      * @param null|integer|string $vn Verification number
      * @return Rut
      */
-    static public function set($number = null, $vn = null)
+    public static function set($number = null, $vn = null)
     {
         return (new self($number, $vn));
     }
@@ -124,8 +129,7 @@ class Rut {
      */
     public function vn($vn = null)
     {
-        if ($vn !== null)
-        {
+        if ($vn !== null) {
             $this->vn = strtoupper($this->escape($vn));
             return $this;
         }
@@ -135,12 +139,11 @@ class Rut {
     /**
      * Get or sets the RUT Number
      * @param $number
-     * @return $this
+     * @return $this|int
      */
     public function number($number = null)
     {
-        if ($number !== null)
-        {
+        if ($number !== null) {
             $this->number = $this->escape($number);
             return $this;
         }
@@ -150,29 +153,25 @@ class Rut {
     /**
      * Get or sets the scape chars
      * @param array $chars
-     * @return $this
-     * @internal param $number
+     * @return $this|array
      */
     public function scape_chars(array $chars = null)
     {
-        if ($chars !== null)
-        {
-            $this->scape_chars = $chars;
+        if ($chars !== null) {
+            $this->escapeChars = $chars;
             return $this;
         }
-        return $this->scape_chars;
+        return $this->escapeChars;
     }
 
     /**
      * Get or sets the verification number separator
-     * @param array $chars
-     * @return $this
-     * @internal param $number
+     * @param array|null $vnSeparator
+     * @return $this|string
      */
     public function vnSeparator(array $vnSeparator = null)
     {
-        if ($vnSeparator !== null)
-        {
+        if ($vnSeparator !== null) {
             $this->vnSeparator = $vnSeparator;
             return $this;
         }
@@ -185,12 +184,18 @@ class Rut {
      * Devuelve true si el parámetro $rut es válido
      *
      * @return bool
+     * @throws InvalidFormatException
      */
-    public function isValid(){
-        if (!$this->hasValidFormat()) return false;
+    public function isValid()
+    {
+        if (!$this->hasValidFormat()) {
+            return false;
+        }
 
         $vn_has_to_be = $this->calculateVerificationNumber();
-        if($this->vn == $vn_has_to_be) return true;
+        if ($this->vn == $vn_has_to_be) {
+            return true;
+        }
 
         return false;
     }
@@ -201,8 +206,10 @@ class Rut {
      * @param $rut
      * @param  $vn
      * @return bool
+     * @throws InvalidFormatException
      */
-    public function validate(){
+    public function validate()
+    {
         return $this->isValid();
     }
 
@@ -218,11 +225,13 @@ class Rut {
      *
      * @return string
      */
-    public function calculateVerificationNumber(){
+    public function calculateVerificationNumber()
+    {
         $rut = $this->number;
         $s=1;
-        for($m=0; $rut != 0; $rut /= 10)
+        for ($m=0; $rut != 0; $rut /= 10) {
             $s=($s+$rut % 10 * (9-$m++%6))%11;
+        }
         return chr($s?$s+47:75);
     }
 
@@ -236,9 +245,11 @@ class Rut {
      * @param null $vn
      * @return array [$rut,$vn]
      */
-    static public function split($rut, $vn = null){
-        if (!is_null($vn))
+    public static function split($rut, $vn = null)
+    {
+        if (!is_null($vn)) {
             return [$rut, $vn];
+        }
         $vn = (substr($rut, -1));//Get the last character
         $rut = substr($rut, 0, -1); //Remove tha last char from the rut
 
@@ -261,10 +272,11 @@ class Rut {
     /**
      * Get the normalized version of the RUT.
      * @return string
+     * @throws InvalidFormatException
      */
-    public function normalize(){
+    public function normalize()
+    {
         return $this->format(self::FORMAT_ESCAPED);
-
     }
 
     /**
@@ -283,15 +295,16 @@ class Rut {
      *
      * Formatea el RUt en alguno de los 3 formatos disponibles.
      *
-     * @param $rut
-     * @param null $vn
      * @param int $format
      * @return string
+     * @throws InvalidFormatException
      */
-    public function format($format = self::FORMAT_COMPLETE){
-        if (!$this->hasValidFormat()) return false;
-        switch ($format)
-        {
+    public function format($format = self::FORMAT_COMPLETE)
+    {
+        if (!$this->hasValidFormat()) {
+            return false;
+        }
+        switch ($format) {
             case static::FORMAT_COMPLETE:
                 return $this->join(
                     number_format($this->number, 0, null, "."),
@@ -317,10 +330,12 @@ class Rut {
      *
      * @return bool
      */
-    public function hasValidFormat(){
-        $is_ok = (preg_match('/^[0-9]+$/', $this->number) && preg_match('/([K0-9])$/', $this->vn) && strlen($this->number) > $this->min_chars && strlen($this->number) < $this->max_chars);
-        if (!$is_ok && $this->use_exceptions)
+    public function hasValidFormat()
+    {
+        $is_ok = (preg_match('/^[0-9]+$/', $this->number) && preg_match('/([K0-9])$/', $this->vn) && strlen($this->number) > $this->minChars && strlen($this->number) < $this->maxChars);
+        if (!$is_ok && $this->useExceptions) {
             throw new InvalidFormatException("R.U.T. '{$this->number}' with verification code '{$this->vn}' has an invalid format");
+        }
 
         return $is_ok;
     }
@@ -332,9 +347,14 @@ class Rut {
      *
      * @return string
      */
-    public function join($str1 = null, $str2 = null){
-        if (is_null($str1)) $str1 = $this->number();
-        if (is_null($str2)) $str2 = $this->vn();
+    public function join($str1 = null, $str2 = null)
+    {
+        if (is_null($str1)) {
+            $str1 = $this->number();
+        }
+        if (is_null($str2)) {
+            $str2 = $this->vn();
+        }
 
         return $str1 . $this->vnSeparator . $str2;
     }
@@ -345,8 +365,9 @@ class Rut {
      *
      * @return $this
      */
-    public function quiet() {
-        $this->use_exceptions = false;
+    public function quiet()
+    {
+        $this->useExceptions = false;
         return $this;
     }
 
@@ -355,8 +376,9 @@ class Rut {
      *
      * @return $this
      */
-    public function use_exceptions() {
-        $this->use_exceptions = true;
+    public function use_exceptions()
+    {
+        $this->useExceptions = true;
         return $this;
     }
 
@@ -366,7 +388,7 @@ class Rut {
      */
     public function is_using_exceptions()
     {
-        return $this->use_exceptions;
+        return $this->useExceptions;
     }
 
     /**
@@ -377,9 +399,12 @@ class Rut {
         return [$this->number, $this->vn];
     }
 
+    /**
+     * @return string
+     * @throws InvalidFormatException
+     */
     public function __toString()
     {
         return $this->format();
     }
 }
-

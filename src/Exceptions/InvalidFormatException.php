@@ -2,5 +2,4 @@
 
 class InvalidFormatException extends \Exception
 {
-
 }
