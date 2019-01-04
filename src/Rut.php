@@ -151,6 +151,20 @@ class Rut
     }
 
     /**
+     * Get or sets the minimum amount of characters a RUT can have to ve valid
+     * @param null $minChars
+     * @return $this|int
+     */
+    public function minChars($minChars = null)
+    {
+        if ($minChars !== null) {
+            $this->minChars= $minChars;
+            return $this;
+        }
+        return $this->minChars;
+    }
+
+    /**
      * Get or sets the scape chars
      * @param array $chars
      * @return $this|array
