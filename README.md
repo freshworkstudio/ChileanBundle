@@ -1,7 +1,7 @@
 # Chilean Bundle
 
 A PHP composer package with Chilean validations, common variables, etc.
-Viva Chile Mierda!
+Viva Chile Mier...
 
 ## This package includes:
 
@@ -214,6 +214,16 @@ Even a shorter syntaxis:
 for($i = 0; $i < 10; $i++)
     echo \Freshwork\ChileanBundle\Rut::set(rand(1000000, 25000000))->fix()->format() . "\n";
 ``` 
+---
+# Licencia y Postalware
+Puedes usar este paquete gratuitamente sin ninguna restricción, aunque como está de moda, implementamos una licencia 'Postalware'. Si usas este paquete en producción y te gusta como funciona, Agradeceríamos bastante si nos envías una postal de tu ciudad/comuna, una nota de agradecimiento o un súper8.
+
+Dirección
+Nombre: Gonzalo De Spirito
+Apoquindo 5980. Piso 17, Las Condes, Santiago. 
+Chile,
+
+
 ---
 # Testing
 You can run the tests as `./vendor/bin/codecept run`
