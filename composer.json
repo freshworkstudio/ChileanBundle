@@ -1,9 +1,9 @@
 {
-  "name": "freshwork/chilean-bundle",
-  "description": "A PHP composer package with Chilean validations, common variables, etc. (RUT, IVA, ETC). Ready for Laravel 5. Grande chile ctm :)",
+  "name": "pittacusw/chilean-bundle",
+  "description": "A PHP composer package with Chilean validations, common variables, etc. (RUT, IVA, ETC). Ready for Laravel 8.",
   "authors": [
     {
-      "name": "Gonzalo De Spirito | Freshwork Studio Chile",
+      "name": "Freshwork Studio Chile",
       "email": "gonzalo@freshworkstudio.com"
     }
   ],
@@ -17,7 +17,8 @@
   ],
   "license": "MIT",
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=7.3.0",
+    "laravel/framework": ">=8.0"
   },
   "require-dev": {
     "codeception/codeception": "^2.1",
@@ -25,16 +26,16 @@
   },
   "autoload": {
     "psr-4": {
-      "Freshwork\\ChileanBundle\\": "src/"
+      "PittacusW\\ChileanBundle\\": "src/"
     }
   },
   "extra": {
     "laravel": {
       "providers": [
-        "Freshwork\\ChileanBundle\\Laravel\\ChileanBundleServiceProvider"
+        "PittacusW\\ChileanBundle\\Laravel\\ChileanBundleServiceProvider"
       ],
       "aliases": {
-        "Rut": "Freshwork\\ChileanBundle\\Facades\\Rut"
+        "Rut": "PittacusW\\ChileanBundle\\Facades\\Rut"
       }
     }
   }
