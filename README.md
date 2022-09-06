@@ -181,7 +181,7 @@ RUT Generator
 
 use \Freshwork\ChileanBundle\Rut;
 
-//We loop 100 times
+//We loop 10 times
 for($i = 0; $i < 10; $i++)
 {
     //generate random number between 1.000.000 and 25.000.000
@@ -190,7 +190,7 @@ for($i = 0; $i < 10; $i++)
     //We create a new RUT wihtout verification number (the second paramenter of Rut constructor)
     $rut = new Rut($random_number);
 
-    //The fix method calculates the  
+    //The fix method calculates the verification number
     echo $rut->fix()->format() . " \n";
 }
 //Output (random)
@@ -220,7 +220,7 @@ Puedes usar este paquete gratuitamente sin ninguna restricción, aunque como est
 
 Dirección
 Nombre: Gonzalo De Spirito
-Apoquindo 5980. Piso 17, Las Condes, Santiago. 
+Providencia 229, Providencia. 
 Chile,
 
 
