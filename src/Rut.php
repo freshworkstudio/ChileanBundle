@@ -244,7 +244,7 @@ class Rut
         $rut = $this->number;
         $s=1;
         for ($m=0; $rut != 0; $rut /= 10) {
-            $s=($s+$rut % 10 * (9-$m++%6))%11;
+            $s=((int)$s+(int)$rut % (int)10 * ((int)9-(int)$m++%(int)6))%(int)11;
         }
         return chr($s?$s+47:75);
     }
