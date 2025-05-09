@@ -169,7 +169,7 @@ class Rut
      * @param array $chars
      * @return $this|array
      */
-    public function scape_chars(array $chars = null)
+    public function scape_chars(?array $chars = null)
     {
         if ($chars !== null) {
             $this->escapeChars = $chars;
@@ -183,7 +183,7 @@ class Rut
      * @param array|null $vnSeparator
      * @return $this|string
      */
-    public function vnSeparator(array $vnSeparator = null)
+    public function vnSeparator(?array $vnSeparator = null)
     {
         if ($vnSeparator !== null) {
             $this->vnSeparator = $vnSeparator;
