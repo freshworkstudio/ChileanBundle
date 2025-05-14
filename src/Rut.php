@@ -58,14 +58,14 @@ class Rut
      * The number part of the RUT. Example: 12.345.678-9 ($rut = 12345678)
      * @var integer
      */
-    protected $number = null;
+    protected $number;
 
     /**
      * Verification Number of the RUT
      * The verification number part of the RUT. Example: 12.345.678-9 ($vn = 9)
      * @var string
      */
-    protected $vn = null;
+    protected $vn;
 
     /**
      *
@@ -104,7 +104,7 @@ class Rut
      */
     public static function parse($rut)
     {
-        list($rut, $vn) = self::split($rut);
+        [$rut, $vn] = self::split($rut);
 
         return (new self($rut, $vn));
     }
@@ -203,13 +203,16 @@ class Rut
     public function isValid()
     {
         if (!$this->hasValidFormat()) {
+            if ($this->useExceptions) {
+                throw new InvalidFormatException("R.U.T. '{$this->number}' with verification code '{$this->vn}' has an invalid format");
+            }
             return false;
         }
 
         $vn_has_to_be = $this->calculateVerificationNumber();
         if ($this->vn == $vn_has_to_be) {
             return true;
-        }
+        };
 
         return false;
     }
@@ -244,7 +247,7 @@ class Rut
         $rut = $this->number;
         $s=1;
         for ($m=0; $rut != 0; $rut /= 10) {
-            $s=((int)$s+(int)$rut % (int)10 * ((int)9-(int)$m++%(int)6))%(int)11;
+            $s=($s+(int)$rut % 10 * (9-$m++%6))%11;
         }
         return chr($s?$s+47:75);
     }
@@ -346,12 +349,23 @@ class Rut
      */
     public function hasValidFormat()
     {
-        $is_ok = (preg_match('/^[0-9]+$/', $this->number) && preg_match('/([K0-9])$/', $this->vn) && strlen($this->number) > $this->minChars && strlen($this->number) < $this->maxChars);
-        if (!$is_ok && $this->useExceptions) {
-            throw new InvalidFormatException("R.U.T. '{$this->number}' with verification code '{$this->vn}' has an invalid format");
+        if (strlen($this->number) >= $this->maxChars) {
+            return false;
         }
 
-        return $is_ok;
+        if (strlen($this->number) <= $this->minChars) {
+            return false;
+        }
+
+        if (!preg_match('/([K0-9])$/', $this->vn)) {
+            return false;
+        }
+
+        if (!preg_match('/^[0-9]+$/', $this->number)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

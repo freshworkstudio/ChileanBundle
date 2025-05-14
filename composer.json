@@ -20,8 +20,7 @@
     "php": ">=5.4.0"
   },
   "require-dev": {
-    "codeception/codeception": "^2.1",
-    "codeception/specify": "^0.4.3",
+    "pestphp/pest": "^3.8",
     "rector/rector": "^2.0"
   },
   "autoload": {
@@ -37,6 +36,11 @@
       "aliases": {
         "Rut": "Freshwork\\ChileanBundle\\Facades\\Rut"
       }
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
     }
   }
 }
