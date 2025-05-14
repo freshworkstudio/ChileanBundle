@@ -226,7 +226,7 @@ Chile,
 
 ---
 # Testing
-You can run the tests as `./vendor/bin/codecept run`
+You can run the tests as `./vendor/bin/pest`
 
 ---
 # Contributing
