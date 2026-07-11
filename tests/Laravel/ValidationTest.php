@@ -45,6 +45,25 @@ it('validates using the Rut rule object', function () {
     expect($notString->fails())->toBeTrue();
 });
 
+it('passes the cl_phone validation rule with valid phones', function ($value) {
+    $validator = Validator::make(['phone' => $value], ['phone' => 'required|cl_phone']);
+
+    expect($validator->passes())->toBeTrue();
+})->with(['+56 9 8765 4321', '987654321', '221234567']);
+
+it('fails the cl_phone validation rule with invalid phones', function ($value) {
+    $validator = Validator::make(['phone' => $value], ['phone' => 'required|cl_phone']);
+
+    expect($validator->fails())->toBeTrue();
+})->with(['12345678', 'not-a-phone', '887654321']);
+
+it('returns a translated message for the cl_phone rule', function () {
+    $validator = Validator::make(['phone' => 'nope'], ['phone' => 'cl_phone']);
+
+    expect($validator->errors()->first('phone'))
+        ->toBe('The phone field must be a valid Chilean phone number.');
+});
+
 it('resolves the rut binding and facade', function () {
     expect(app('rut'))->toBeInstanceOf(Rut::class);
     expect(Freshwork\ChileanBundle\Facades\Rut::check('12.345.678-5'))->toBeTrue();

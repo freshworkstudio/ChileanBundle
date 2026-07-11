@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Freshwork\ChileanBundle\Laravel;
 
+use Freshwork\ChileanBundle\Phone;
 use Freshwork\ChileanBundle\Rut;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +29,14 @@ class ChileanBundleServiceProvider extends ServiceProvider
         Validator::replacer('cl_rut', function (string $message, string $attribute) {
             return $message === 'validation.cl_rut'
                 ? trans('chilean-bundle::validation.cl_rut', ['attribute' => $attribute])
+                : str_replace(':attribute', $attribute, $message);
+        });
+
+        Validator::extend('cl_phone', fn ($attribute, $value): bool => (is_string($value) || is_int($value)) && Phone::check($value));
+
+        Validator::replacer('cl_phone', function (string $message, string $attribute) {
+            return $message === 'validation.cl_phone'
+                ? trans('chilean-bundle::validation.cl_phone', ['attribute' => $attribute])
                 : str_replace(':attribute', $attribute, $message);
         });
     }
