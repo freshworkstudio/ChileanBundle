@@ -1,3 +1,5 @@
+<!-- banner -->
+
 # Chilean Bundle
 
 [![Tests](https://github.com/freshworkstudio/ChileanBundle/actions/workflows/run-tests.yml/badge.svg)](https://github.com/freshworkstudio/ChileanBundle/actions/workflows/run-tests.yml)
@@ -5,14 +7,27 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/freshwork/chilean-bundle.svg)](https://packagist.org/packages/freshwork/chilean-bundle)
 [![License](https://img.shields.io/packagist/l/freshwork/chilean-bundle.svg)](LICENSE)
 
-A PHP composer package with Chilean validations, common variables, etc.
+A PHP composer package with Chilean validations, formatters and utilities.
 Viva Chile Mier...
 
-## This package includes:
+```php
+Rut::check('12.345.678-5'); // true
+Iva::add(10000); // 11900
+Clp::format(1234567); // '$1.234.567'
+Phone::check('+56 9 8765 4321'); // true
+Region::Metropolitana->capital(); // 'Santiago'
+```
 
-* R.U.T. validation, formatting and generation
-* Laravel integration: `cl_rut` validation rule, Rule object, Facade and Eloquent cast
-* More functions coming soon...
+## This package includes
+
+| Feature | Class | Description |
+|---|---|---|
+| **R.U.T.** | `Rut` | Validation, formatting, parsing and generation of Chilean RUTs |
+| **I.V.A.** | `Iva` | Chilean VAT (19%) constants and calculations |
+| **Pesos (CLP)** | `Clp` | Format and parse Chilean peso amounts |
+| **Phones** | `Phone` | Validate, normalize and format Chilean phone numbers |
+| **Regions** | `Region` | Enum with the 16 regions of Chile (names, numerals, capitals) |
+| **Laravel** | — | `cl_rut` / `cl_phone` validation rules, Rule object, Facade and Eloquent cast |
 
 ## Requirements
 
@@ -23,16 +38,16 @@ Viva Chile Mier...
 
 ## Installation
 
-From the command line, run:
-
 ```bash
 composer require freshwork/chilean-bundle
 ```
 
 If you're using Laravel, the package supports Auto-Discovery, so you're done.
-If you're not using Laravel, just use the `Freshwork\ChileanBundle\Rut` class directly.
+If you're not using Laravel, just use the classes directly — they have no dependencies.
 
-## Usage
+---
+
+## R.U.T.
 
 ### The Basics
 
@@ -46,19 +61,18 @@ $rut = new Rut('11.111.111', '1');
 $rut->validate(); // true
 ```
 
-### The `parse()` method
+### `parse()`
 
-Is the recommended way of using the object. It will automatically separate the Verification Number (dígito verificador) and the rest of the number.
+The recommended way of creating a `Rut`. It automatically separates the verification number (dígito verificador) from the rest of the number, and escapes dots, dashes and spaces.
 
 ```php
 Rut::parse('11.111.111-1')->validate(); // true
-Rut::parse('11111111-1')->validate(); // true
 Rut::parse('12.345.678-5')->validate(); // true
 Rut::parse('123456785')->validate(); // true
-Rut::parse('1.23.45.6.7.8-5')->validate(); // true. It escapes all the dots and dashes.
+Rut::parse('1.23.45.6.7.8-5')->validate(); // true
 ```
 
-### The `check()` method
+### `check()`
 
 The quickest way to know if a string is a valid RUT. It never throws exceptions.
 
@@ -68,154 +82,165 @@ Rut::check('12.345.678-9'); // false
 Rut::check('not-a-rut'); // false
 ```
 
-### The `set()` method
+### `validate()` / `isValid()`
 
-This is a shortcut for `(new Rut($number, $vn))`.
-
-```php
-Rut::set('10.123.123', '5');
-```
-
-### The `validate()` & `isValid()` methods
-
-`validate()` is an alias of `isValid()`.
-
-```php
-Rut::parse('12345678-5')->isValid(); // true
-```
-
-### Invalid R.U.T.
-
-If the R.U.T. is invalid, it will return false.
+`validate()` is an alias of `isValid()`. If the RUT is well-formed but the verification number is wrong, it returns `false`:
 
 ```php
 Rut::parse('12.345.678-9')->validate(); // false
 ```
 
-If the R.U.T. has a wrong format, it will throw a `Freshwork\ChileanBundle\Exceptions\InvalidFormatException`.
+If the RUT has an invalid **format**, it throws `Freshwork\ChileanBundle\Exceptions\InvalidFormatException`:
 
 ```php
 Rut::parse('12.3k5.6L8-9')->validate(); // throws InvalidFormatException
-Rut::set('12.345.678')->validate(); // throws exception. We didn't set the verification number
+Rut::set('12.345.678')->validate(); // throws: no verification number set
 ```
 
-#### `Quiet` mode
+#### Quiet mode
 
-You can prevent the object from throwing an `InvalidFormatException`, so `validate()` will just return false, using the `quiet()` method.
+Use `quiet()` to return `false` instead of throwing. Re-enable exceptions with `use_exceptions()`.
 
 ```php
-Rut::parse('12.3k5.6L8-9')->quiet()->validate(); // returns false. No exception
+Rut::parse('12.3k5.6L8-9')->quiet()->validate(); // false, no exception
 ```
 
-You can re-enable exceptions with `use_exceptions()`.
-
-### The `calculateVerificationNumber()` method
-
-You can get the correct verification number of a RUT. Note that we are passing just one argument to the `set()` method: we are not defining a verification number.
-
-```php
-Rut::set('12.345.678')->calculateVerificationNumber(); // returns '5'
-Rut::parse('12.345.678-9')->calculateVerificationNumber(); // returns '5'
-```
-
-Esta clase se basa en esta simple, pero eficiente función:
-[http://www.dcc.uchile.cl/~mortega/microcodigos/validarrut/php.php](http://www.dcc.uchile.cl/~mortega/microcodigos/validarrut/php.php)
-
-### The `format()` method
-
-Returns the RUT as a string in one of the available formats.
+### `format()` & `normalize()`
 
 ```php
 use Freshwork\ChileanBundle\RutFormat;
 
-Rut::parse('123456785')->format(); // returns 12.345.678-5
-Rut::parse('123456785')->format(RutFormat::Complete); // returns 12.345.678-5
-Rut::parse('123456785')->format(RutFormat::WithDash); // returns 12345678-5
-Rut::parse('123456785')->format(RutFormat::Escaped); // returns 123456785
+Rut::parse('123456785')->format(); // '12.345.678-5'
+Rut::parse('123456785')->format(RutFormat::Complete); // '12.345.678-5'
+Rut::parse('123456785')->format(RutFormat::WithDash); // '12345678-5'
+Rut::parse('123456785')->format(RutFormat::Escaped); // '123456785'
+
+// normalize() is an alias of format(RutFormat::Escaped) — ideal for storing in a database
+Rut::parse('12.345.678-5')->normalize(); // '123456785'
 ```
 
-The legacy `Rut::FORMAT_COMPLETE`, `Rut::FORMAT_WITH_DASH` and `Rut::FORMAT_ESCAPED` constants still work.
+The legacy `Rut::FORMAT_*` int constants still work. On an invalid RUT, `format()` throws an `InvalidFormatException` (or returns `false` in quiet mode).
 
-If the RUT has an invalid format, `format()` throws an `InvalidFormatException` (or returns `false` in quiet mode).
-
-### The `normalize()` method
-
-If you are saving RUTs in the database, I recommend saving the normalized rut string. This method is an alias of `->format(RutFormat::Escaped)`.
+### `calculateVerificationNumber()` & `fix()`
 
 ```php
-Rut::parse('12.345.678-5')->normalize(); // returns '123456785'
+Rut::set('12.345.678')->calculateVerificationNumber(); // '5'
+
+Rut::parse('12.345.678-9')->fix()->format(); // '12.345.678-5' (vn corrected)
+Rut::set('12345678')->fix()->validate(); // true
 ```
 
-### The `toArray()` method
-
-```php
-Rut::parse('12.345.678-5')->toArray(); // returns ['12345678', '5']
-```
-
-### String & JSON serialization
-
-The `Rut` object implements `Stringable` and `JsonSerializable`:
-
-```php
-(string) Rut::parse('123456785'); // '12.345.678-5'
-json_encode(['rut' => Rut::parse('123456785')]); // {"rut":"12.345.678-5"}
-```
-
-### The `fix()` method
-
-Fixes the current RUT: it takes the number part (without verification number), calculates the correct verification number, and updates it.
-
-```php
-Rut::parse('12.345.678-9')->fix()->format(); // returns '12.345.678-5'
-
-// Set a new rut without setting any verification number
-Rut::set('12345678')->fix()->format(); // returns '12.345.678-5'
-
-Rut::parse('12.345.678-9')->validate(); // returns false
-Rut::parse('12.345.678-9')->fix()->validate(); // returns true
-```
-
-### The `random()` method
+### `random()`
 
 Generates a random valid RUT. Useful for seeders, factories and tests.
 
 ```php
 Rut::random(); // e.g. 17.062.139-5
-Rut::random()->format(RutFormat::WithDash); // e.g. 18815969-9
-
-// Custom range
-Rut::random(5000000, 30000000);
+Rut::random(5000000, 30000000); // custom range
 ```
 
-### The `vn()` and `number()` methods
-
-You can get and set the RUT number and verification number with these methods. With no arguments they act as getters; otherwise they set the value and return the object.
+### Getters, setters & serialization
 
 ```php
-// Getters
-Rut::parse('12.345.678-9')->vn(); // returns '9'
-Rut::parse('12.345.678-9')->number(); // returns '12345678'
+Rut::parse('12.345.678-5')->number(); // '12345678'
+Rut::parse('12.345.678-5')->vn(); // '5'
+Rut::parse('12.345.678-5')->toArray(); // ['12345678', '5']
 
-// Setters
-Rut::parse('12.345.678-9')->vn('5')->format(); // returns '12.345.678-5'
-Rut::set()->number('12.345.678')->vn('5')->format(); // returns '12.345.678-5'
+(string) Rut::parse('123456785'); // '12.345.678-5' (Stringable)
+json_encode(['rut' => Rut::parse('123456785')]); // {"rut":"12.345.678-5"} (JsonSerializable)
 ```
 
-# Laravel
+---
 
-### Validation
+## I.V.A.
 
-You can validate RUTs using Laravel's validation system with the `cl_rut` rule:
+Chilean VAT helpers. All amounts are rounded to the nearest peso (CLP has no decimals).
+
+```php
+use Freshwork\ChileanBundle\Iva;
+
+Iva::RATE; // 0.19
+Iva::PERCENTAGE; // 19
+
+Iva::of(10000); // 1900 — IVA for a net amount
+Iva::add(10000); // 11900 — gross (net + IVA)
+Iva::net(11900); // 10000 — net from a gross amount
+Iva::fromGross(11900); // 1900 — IVA contained in a gross amount
+```
+
+---
+
+## Pesos (CLP)
+
+```php
+use Freshwork\ChileanBundle\Clp;
+
+Clp::format(1234567); // '$1.234.567'
+Clp::format(-1234567); // '-$1.234.567'
+Clp::format(1234567, symbol: false); // '1.234.567'
+
+Clp::parse('$1.234.567'); // 1234567
+Clp::parse('-$1.234'); // -1234
+```
+
+---
+
+## Phones
+
+Chilean phone numbers have 9 national digits: mobiles start with `9`, landlines with `2`–`7` (area code included).
+
+```php
+use Freshwork\ChileanBundle\Phone;
+
+Phone::check('+56 9 8765 4321'); // true
+Phone::check('09-8765 4321'); // true
+Phone::check('12345678'); // false
+
+$phone = Phone::parse('09 8765 4321');
+$phone->isValid(); // true
+$phone->isMobile(); // true
+$phone->isLandline(); // false
+$phone->number(); // '987654321' (normalized national number)
+$phone->e164(); // '+56987654321'
+$phone->format(); // '+56 9 8765 4321'
+(string) $phone; // '+56 9 8765 4321'
+```
+
+---
+
+## Regions
+
+An enum with the 16 regions of Chile, backed by their official region number.
+
+```php
+use Freshwork\ChileanBundle\Region;
+
+Region::Metropolitana->value; // 13
+Region::Metropolitana->officialName(); // 'Región Metropolitana de Santiago'
+Region::Metropolitana->romanNumeral(); // 'RM'
+Region::Metropolitana->capital(); // 'Santiago'
+
+Region::from(9); // Region::Araucania
+Region::cases(); // all 16 regions
+
+Region::northToSouth(); // regions in geographic order
+Region::options(); // [15 => 'Región de Arica y Parinacota', ...] ready for selects
+```
+
+---
+
+## Laravel
+
+### Validation rules
 
 ```php
 $request->validate([
-    'name' => 'required|min:2',
-    'email' => 'required|email',
     'rut' => 'required|cl_rut',
+    'phone' => 'required|cl_phone',
 ]);
 ```
 
-Or, if you prefer a dedicated Rule object:
+Or with a dedicated Rule object:
 
 ```php
 use Freshwork\ChileanBundle\Laravel\Rules\Rut;
@@ -225,7 +250,7 @@ $request->validate([
 ]);
 ```
 
-Error messages are translated (English and Spanish included). You can publish and customize them:
+Error messages are translated (English and Spanish included). Publish and customize them with:
 
 ```bash
 php artisan vendor:publish --tag=chilean-bundle-lang
@@ -260,12 +285,11 @@ $client->rut->format(); // '12.345.678-5'
 use Freshwork\ChileanBundle\Facades\Rut;
 
 Rut::check('12.345.678-5'); // true
-Rut::parse('12.345.678-5')->format(); // '12.345.678-5'
 ```
 
 ---
 
-# Upgrading from 1.x
+## Upgrading from 1.x
 
 * PHP 8.2+ is now required.
 * `format()` and `normalize()` now throw an `InvalidFormatException` on invalid RUTs when exceptions are enabled (before, they silently returned `false`). In `quiet()` mode they still return `false`.
@@ -276,7 +300,7 @@ Rut::parse('12.345.678-5')->format(); // '12.345.678-5'
 
 ---
 
-# Testing
+## Testing & code quality
 
 ```bash
 composer test # Run the test suite (Pest)
@@ -286,7 +310,7 @@ composer analyse # Static analysis (PHPStan)
 
 ---
 
-# Licencia y Postalware
+## Licencia y Postalware
 
 Puedes usar este paquete gratuitamente sin ninguna restricción, aunque como está de moda, implementamos una licencia 'Postalware'. Si usas este paquete en producción y te gusta como funciona, agradeceríamos bastante si nos envías una postal de tu ciudad/comuna, una nota de agradecimiento o un súper8.
 
@@ -297,7 +321,7 @@ Chile
 
 ---
 
-# Contributing
+## Contributing
 
 Pull requests are welcome! Please make sure `composer test`, `composer lint` and `composer analyse` pass.
 
