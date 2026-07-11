@@ -1,53 +1,34 @@
-<?php namespace Freshwork\ChileanBundle\Laravel;
+<?php
 
-use App;
+declare(strict_types=1);
+
+namespace Freshwork\ChileanBundle\Laravel;
+
 use Freshwork\ChileanBundle\Rut;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
-use Validator;
 
 class ChileanBundleServiceProvider extends ServiceProvider
 {
-
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = false;
-
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
+    public function register(): void
     {
+        $this->app->bind('rut', fn (): Rut => new Rut);
     }
 
-    public function boot()
+    public function boot(): void
     {
-        Validator::extend('cl_rut', function ($attribute, $value, $parameters, $validator) {
-            $validator->addReplacer('cl_rut', function ($message, $attribute, $rule, $parameters) {
-                return str_replace(':attribute', $attribute, $message == 'validation.cl_rut'
-                    ? 'El atributo :attribute no es válido.'
-                    : $message);
-            });
+        $this->loadTranslationsFrom(__DIR__.'/../../lang', 'chilean-bundle');
 
-            return Rut::parse($value)->quiet()->validate();
+        $this->publishes([
+            __DIR__.'/../../lang' => $this->app->langPath('vendor/chilean-bundle'),
+        ], 'chilean-bundle-lang');
+
+        Validator::extend('cl_rut', fn ($attribute, $value): bool => (is_string($value) || is_int($value)) && Rut::check($value));
+
+        Validator::replacer('cl_rut', function (string $message, string $attribute) {
+            return $message === 'validation.cl_rut'
+                ? trans('chilean-bundle::validation.cl_rut', ['attribute' => $attribute])
+                : str_replace(':attribute', $attribute, $message);
         });
-
-        app()->bind('rut', function () {
-            return new Rut;
-        });
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [];
     }
 }
