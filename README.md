@@ -1,4 +1,6 @@
-<!-- banner -->
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8848dc2e-dc62-4ad5-847c-502568b8e0ca" alt="Chilean Bundle — PHP utilities for Chile: RUT, IVA, CLP, Phones, Regions" width="100%">
+</p>
 
 # Chilean Bundle
 
