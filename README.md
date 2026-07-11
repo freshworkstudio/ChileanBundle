@@ -37,7 +37,7 @@ Region::Metropolitana->capital(); // 'Santiago'
 ## Requirements
 
 * PHP 8.2+
-* Laravel 11+ (optional, only for the Laravel integration)
+* Laravel 10+ (optional, only for the Laravel integration — the test suite runs against Laravel 11 and 12)
 
 > Using PHP 5.x/7.x or an older Laravel? Stick with `freshwork/chilean-bundle:^2.2` — the legacy 2.x series supports PHP 5.4+.
 
@@ -331,9 +331,9 @@ The **legacy 2.x series remains available and compatible with PHP 5.4+** (and ol
 composer require freshwork/chilean-bundle:^2.2
 ```
 
-### 1. PHP 8.2+ (and Laravel 11+) required
+### 1. PHP 8.2+ (and Laravel 10+) required
 
-v3 uses modern PHP features (enums, strict types, first-class match expressions). The Laravel integration (validation rules, cast, facade) targets Laravel 11+.
+v3 uses modern PHP features (enums, strict types, first-class match expressions). The Laravel integration (validation rules, cast, facade) relies on contracts introduced in Laravel 10; the test suite runs against Laravel 11 and 12.
 
 ### 2. `format()` and `normalize()` now throw on invalid RUTs
 
@@ -367,7 +367,7 @@ Rut::set('12345678', '9')->vnSeparator('·')->join(); // '12345678·9'
 
 ### What's new in v3
 
-Besides the modernized `Rut` (with `Rut::check()`, `Rut::random()`, `RutFormat` enum, `Stringable`/`JsonSerializable`), v3 adds `Iva`, `Clp`, `Phone`, `Region` and `Comuna`, plus the `cl_phone` validation rule, the `Rules\Rut` rule object and the `RutCast` Eloquent cast — all documented above.
+Besides the modernized [`Rut`](#rut) (with `Rut::check()`, `Rut::random()`, `RutFormat` enum, `Stringable`/`JsonSerializable`), v3 adds [`Iva`](#iva), [`Clp`](#pesos-clp), [`Phone`](#phones), [`Region`](#regions) and [`Comuna`](#comunas), plus the [`cl_rut` / `cl_phone` validation rules and the `Rules\Rut` rule object](#validation-rules) and the [`RutCast` Eloquent cast](#eloquent-cast).
 
 ---
 
