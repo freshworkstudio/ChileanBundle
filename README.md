@@ -29,6 +29,7 @@ Region::Metropolitana->capital(); // 'Santiago'
 | **Pesos (CLP)** | `Clp` | Format and parse Chilean peso amounts |
 | **Phones** | `Phone` | Validate, normalize and format Chilean phone numbers |
 | **Regions** | `Region` | Enum with the 16 regions of Chile (names, numerals, capitals) |
+| **Comunas** | `Comuna` | Enum with the 346 comunas backed by their official CUT code |
 | **Laravel** | — | `cl_rut` / `cl_phone` validation rules, Rule object, Facade and Eloquent cast |
 
 ## Requirements
@@ -227,6 +228,31 @@ Region::cases(); // all 16 regions
 
 Region::northToSouth(); // regions in geographic order
 Region::options(); // [15 => 'Región de Arica y Parinacota', ...] ready for selects
+```
+
+---
+
+## Comunas
+
+An enum with the 346 comunas of Chile, backed by their official territorial code (Código Único Territorial — CUT, [SUBDERE](https://www.subdere.gov.cl)). The first digits of the code are the region number, so every comuna knows its region.
+
+```php
+use Freshwork\ChileanBundle\Comuna;
+use Freshwork\ChileanBundle\Region;
+
+Comuna::Santiago->value; // 13101
+Comuna::Santiago->code(); // '13101' (zero-padded official format, e.g. '01101' for Iquique)
+Comuna::Nunoa->officialName(); // 'Ñuñoa'
+Comuna::Nunoa->region(); // Region::Metropolitana
+
+Comuna::from(16101); // Comuna::Chillan
+Comuna::fromName('ñuñoa'); // Comuna::Nunoa (case and accent insensitive)
+
+Comuna::inRegion(Region::Nuble); // the 21 comunas of Ñuble
+Region::Metropolitana->comunas(); // the 52 comunas of the RM
+
+Comuna::options(); // [1101 => 'Iquique', ...] ready for selects
+Comuna::options(Region::Tarapaca); // only Tarapacá's comunas
 ```
 
 ---
