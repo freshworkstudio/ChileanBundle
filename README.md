@@ -11,6 +11,8 @@ A PHP composer package with Chilean validations, formatters and utilities.
 Viva Chile Mier...
 
 ```php
+use Freshwork\ChileanBundle\{Rut, Iva, Clp, Phone, Region};
+
 Rut::check('12.345.678-5'); // true
 Iva::add(10000); // 11900
 Clp::format(1234567); // '$1.234.567'

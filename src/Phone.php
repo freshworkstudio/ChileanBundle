@@ -51,9 +51,15 @@ final class Phone implements Stringable
 
     /**
      * Strip formatting, country code and trunk zeros, keeping the national number.
+     * Input containing anything other than digits and common formatting
+     * characters (+, spaces, dots, dashes, parentheses) is rejected.
      */
     protected static function normalize(string $number): string
     {
+        if (preg_match('/^\+?[0-9\s().-]+$/', $number) !== 1) {
+            return '';
+        }
+
         $digits = (string) preg_replace('/[^0-9]/', '', $number);
 
         if (strlen($digits) === 11 && str_starts_with($digits, self::COUNTRY_CODE)) {
@@ -98,7 +104,12 @@ final class Phone implements Stringable
     }
 
     /**
-     * Human-readable international format. Ex: '+56 9 8765 4321'.
+     * Human-readable international format.
+     *
+     * Mobiles and Santiago landlines have a one-digit prefix (9 / 2); the
+     * remaining landlines use a two-digit area code.
+     *
+     * Ex: '+56 9 8765 4321', '+56 2 2123 4567', '+56 45 212 3456'.
      * Returns null if the number is invalid.
      */
     public function format(): ?string
@@ -107,12 +118,17 @@ final class Phone implements Stringable
             return null;
         }
 
+        $prefixLength = $this->isMobile() || str_starts_with($this->number, '2') ? 1 : 2;
+        $prefix = substr($this->number, 0, $prefixLength);
+        $subscriber = substr($this->number, $prefixLength);
+        $splitAt = strlen($subscriber) - 4;
+
         return sprintf(
             '+%s %s %s %s',
             self::COUNTRY_CODE,
-            substr($this->number, 0, 1),
-            substr($this->number, 1, 4),
-            substr($this->number, 5)
+            $prefix,
+            substr($subscriber, 0, $splitAt),
+            substr($subscriber, $splitAt)
         );
     }
 

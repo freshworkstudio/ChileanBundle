@@ -25,6 +25,12 @@ it('adds IVA to a net amount', function () {
     expect(Iva::add(999))->toBe(1189);
 });
 
+it('rounds the net to the peso before calculating the IVA', function () {
+    expect(Iva::add(1.4))->toBe(1); // net 1 + iva 0
+    expect(Iva::add(999.6))->toBe(1190); // net 1000 + iva 190
+    expect(Iva::add(999.6))->toBe(Iva::add(1000));
+});
+
 it('gets the net amount from a gross amount', function () {
     expect(Iva::net(11900))->toBe(10000);
     expect(Iva::net(1190))->toBe(1000);

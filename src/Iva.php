@@ -35,11 +35,17 @@ final class Iva
     /**
      * Add IVA to a net amount, returning the gross amount.
      *
+     * The net amount is rounded to the peso first, then the IVA is calculated
+     * on that rounded net — mirroring how invoices are built (net and IVA are
+     * separate rounded lines, and the total is their sum).
+     *
      * Iva::add(10000); // 11900
      */
     public static function add(int|float $net): int
     {
-        return (int) round($net) + self::of($net);
+        $net = (int) round($net);
+
+        return $net + self::of($net);
     }
 
     /**

@@ -31,6 +31,13 @@ it('parses CLP-formatted strings', function () {
     expect(Clp::parse(''))->toBe(0);
 });
 
+it('only treats a leading minus as a negative sign', function () {
+    expect(Clp::parse('1-234'))->toBe(1234);
+    expect(Clp::parse('1.234-'))->toBe(1234);
+    expect(Clp::parse('$-1.234'))->toBe(-1234);
+    expect(Clp::parse(' -$1.234'))->toBe(-1234);
+});
+
 it('roundtrips format and parse', function () {
     expect(Clp::parse(Clp::format(9876543)))->toBe(9876543);
     expect(Clp::parse(Clp::format(-500)))->toBe(-500);

@@ -44,7 +44,7 @@ final class Clp
      */
     public static function parse(string $amount): int
     {
-        $negative = str_contains($amount, '-');
+        $negative = (bool) preg_match('/^\s*\$?\s*-/', $amount);
         $digits = (string) preg_replace('/[^0-9]/', '', $amount);
 
         return ($negative ? -1 : 1) * (int) $digits;
