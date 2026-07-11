@@ -103,6 +103,16 @@ enum Region: int
     }
 
     /**
+     * All comunas of this region.
+     *
+     * @return Comuna[]
+     */
+    public function comunas(): array
+    {
+        return Comuna::inRegion($this);
+    }
+
+    /**
      * Regions ordered from north to south (geographic order).
      *
      * @return self[]
