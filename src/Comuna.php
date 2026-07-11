@@ -791,7 +791,7 @@ enum Comuna: int
     }
 
     /**
-     * Comunas as an array suitable for HTML selects: [code => official name].
+     * Comunas as an array suitable for HTML selects: [value => official name].
      * Optionally filtered by region.
      *
      * @return array<int, string>
