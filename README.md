@@ -37,9 +37,9 @@ Region::Metropolitana->capital(); // 'Santiago'
 ## Requirements
 
 * PHP 8.2+
-* Laravel 11+ (optional, only for the Laravel integration)
+* Laravel 10+ (optional, only for the Laravel integration — the test suite runs against Laravel 11 and 12)
 
-> Using PHP 5.x/7.x or an older Laravel? Stick with `freshwork/chilean-bundle:^1.0`.
+> Using PHP 5.x/7.x or an older Laravel? Stick with `freshwork/chilean-bundle:^2.2` — the legacy 2.x series supports PHP 5.4+.
 
 ## Installation
 
@@ -319,14 +319,55 @@ Rut::check('12.345.678-5'); // true
 
 ---
 
-## Upgrading from 1.x
+## Upgrading from 2.x
 
-* PHP 8.2+ is now required.
-* `format()` and `normalize()` now throw an `InvalidFormatException` on invalid RUTs when exceptions are enabled (before, they silently returned `false`). In `quiet()` mode they still return `false`.
-* `vnSeparator()` now takes a `string` (the previous `array` type hint was a bug).
-* `scape_chars()` is deprecated in favor of `escapeChars()` (the old method still works).
-* `Freshwork\ChileanBundle\Laravel\Facades\Rut` is deprecated in favor of `Freshwork\ChileanBundle\Facades\Rut`.
-* Everything else keeps the same API: `parse()`, `set()`, `validate()`, `isValid()`, `fix()`, `join()`, `toArray()`, etc.
+v3.0 is a major release ([full release notes](https://github.com/freshworkstudio/ChileanBundle/releases/tag/v3.0.0)). The core API is unchanged — `parse()`, `set()`, `validate()`, `isValid()`, `fix()`, `join()`, `toArray()` all work exactly as before — but there are a few breaking changes to review.
+
+### Still on PHP 5.x or 7.x? Stay on 2.x
+
+The **legacy 2.x series remains available and compatible with PHP 5.4+** (and older Laravel versions). It's not going anywhere — if you can't upgrade PHP yet, just pin the previous major:
+
+```bash
+composer require freshwork/chilean-bundle:^2.2
+```
+
+### 1. PHP 8.2+ (and Laravel 10+) required
+
+v3 uses modern PHP features (enums, strict types, first-class match expressions). The Laravel integration (validation rules, cast, facade) relies on contracts introduced in Laravel 10; the test suite runs against Laravel 11 and 12.
+
+### 2. `format()` and `normalize()` now throw on invalid RUTs
+
+In 2.x they silently returned `false` even with exceptions enabled — which also made `(string) $rut` fatal on PHP 8. Now they behave like `validate()`:
+
+```php
+// 2.x
+Rut::parse('123-1')->format(); // false (silently)
+
+// 3.x
+Rut::parse('123-1')->format(); // throws InvalidFormatException
+Rut::parse('123-1')->quiet()->format(); // false — same behavior as 2.x
+```
+
+If you relied on the silent `false`, add `->quiet()` to keep the old behavior.
+
+### 3. `vnSeparator()` now takes a `string`
+
+The 2.x type hint was `?array` by mistake, which made the method unusable (passing a string threw a `TypeError`). Now it works as documented:
+
+```php
+Rut::set('12345678', '9')->vnSeparator('·')->join(); // '12345678·9'
+```
+
+### 4. Deprecations (still working, removed in a future major)
+
+| Deprecated | Use instead |
+|---|---|
+| `scape_chars()` | `escapeChars()` |
+| `Freshwork\ChileanBundle\Laravel\Facades\Rut` | `Freshwork\ChileanBundle\Facades\Rut` |
+
+### What's new in v3
+
+Besides the modernized [`Rut`](#rut) (with `Rut::check()`, `Rut::random()`, `RutFormat` enum, `Stringable`/`JsonSerializable`), v3 adds [`Iva`](#iva), [`Clp`](#pesos-clp), [`Phone`](#phones), [`Region`](#regions) and [`Comuna`](#comunas), plus the [`cl_rut` / `cl_phone` validation rules and the `Rules\Rut` rule object](#validation-rules) and the [`RutCast` Eloquent cast](#eloquent-cast).
 
 ---
 
