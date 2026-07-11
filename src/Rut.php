@@ -1,94 +1,72 @@
-<?php namespace Freshwork\ChileanBundle;
+<?php
+
+declare(strict_types=1);
+
+namespace Freshwork\ChileanBundle;
+
+use Freshwork\ChileanBundle\Exceptions\InvalidFormatException;
+use JsonSerializable;
+use Stringable;
 
 /**
+ * Validation and utilities for the Chilean R.U.T.
+ *
  * Author: Gonzalo De Spirito
  * Email: gonzalo@freshworkstudio.com
- * Date: 06-08-14 18:31
  */
-use Freshwork\ChileanBundle\Exceptions\InvalidFormatException;
-
-/**
- * Class Rut
- * Validation and Utils for RUT
- * @package Freshwork\ChileanBundle
- */
-class Rut
+class Rut implements JsonSerializable, Stringable
 {
+    /** @deprecated Use RutFormat::Complete. Ex: 12.345.678-9 */
+    public const FORMAT_COMPLETE = 0;
+
+    /** @deprecated Use RutFormat::Escaped. Ex: 123456789 */
+    public const FORMAT_ESCAPED = 1;
+
+    /** @deprecated Use RutFormat::WithDash. Ex: 12345678-9 */
+    public const FORMAT_WITH_DASH = 2;
 
     /**
-     * Characters to scape from RUT
+     * Characters to escape from the RUT before validating.
      *
-     * Caracteres que queremos eliminar del rut para realizar la validación
+     * Caracteres que queremos eliminar del rut para realizar la validación.
      *
-     * @var array
+     * @var string[]
      */
-    protected $escapeChars = [".", ",", "-", "_", " "];
-
-    /**
-     * @var string
-     */
-    protected $regex = '/([^0-9kK])/';
+    protected array $escapeChars = ['.', ',', '-', '_', ' '];
 
     /**
      * RUT verification number separator.
-     * @var string
      */
-    protected $vnSeparator  = "-";
+    protected string $vnSeparator = '-';
 
     /**
-     * Min amount of chars a RUT can have beign normalized (without dashes or spaces)
-     * @var int
+     * Min amount of chars the number part of a RUT can have once normalized (exclusive).
      */
-    protected $minChars = 5;
+    protected int $minChars = 5;
 
     /**
-     * Max amount of chars a RUT can have beign normalized (without dashes or spaces)
-     * @var int
+     * Max amount of chars the number part of a RUT can have once normalized (exclusive).
      */
-    protected $maxChars = 10;
+    protected int $maxChars = 10;
 
     /**
-     * Determines if the class throws exceptions on validations errors
-     * @var bool
+     * Determines if the class throws exceptions on validation errors.
      */
-    protected $useExceptions = true;
+    protected bool $useExceptions = true;
 
     /**
-     * RUT Number
-     * The number part of the RUT. Example: 12.345.678-9 ($rut = 12345678)
-     * @var integer
+     * The number part of the RUT. Example: 12.345.678-9 ($number = '12345678').
      */
-    protected $number;
+    protected ?string $number = null;
 
     /**
-     * Verification Number of the RUT
-     * The verification number part of the RUT. Example: 12.345.678-9 ($vn = 9)
-     * @var string
+     * The verification number part of the RUT. Example: 12.345.678-9 ($vn = '9').
      */
-    protected $vn;
+    protected ?string $vn = null;
 
-    /**
-     *
-     */
-    const FORMAT_COMPLETE = 0; //Ex: 12.345.678-9
-    /**
-     *
-     */
-    const FORMAT_ESCAPED = 1; //Ex:  123456789
-
-    /**
-     *
-     */
-    const FORMAT_WITH_DASH = 2; //Ex:  12345678-9
-
-    /**
-     * Rut constructor.
-     * @param null $rut
-     * @param null $vn
-     */
-    public function __construct($rut = null, $vn = null)
+    final public function __construct(string|int|null $rut = null, string|int|null $vn = null)
     {
-        if ($rut != null) {
+        if ($rut !== null) {
             $this->number($rut);
         }
         if ($vn !== null) {
@@ -97,342 +75,342 @@ class Rut
     }
 
     /**
-     * Shortcut for (new Rut($rut, $dv)) and automatically detect
-     *
-     * @param string|integer $rut Rut Number with the verification number
-     * @return Rut
+     * Shortcut for (new Rut($rut, $vn)) that automatically splits
+     * the verification number from the rest of the RUT.
      */
-    public static function parse($rut)
+    public static function parse(string|int $rut): static
     {
-        [$rut, $vn] = self::split($rut);
+        [$rut, $vn] = static::split((string) $rut);
 
-        return (new self($rut, $vn));
+        return new static($rut, $vn);
     }
 
     /**
-     * Shortcut for (new Rut($rut, $dv))
-     *
-     * @param string|integer $number Rut Number without the verification number
-     * @param null|integer|string $vn Verification number
-     * @return Rut
+     * Shortcut for (new Rut($number, $vn)).
      */
-    public static function set($number = null, $vn = null)
+    public static function set(string|int|null $number = null, string|int|null $vn = null): static
     {
-        return (new self($number, $vn));
+        return new static($number, $vn);
     }
 
+    /**
+     * Quick check: returns true if $rut is a valid RUT. Never throws.
+     */
+    public static function check(string|int $rut): bool
+    {
+        return static::parse($rut)->quiet()->isValid();
+    }
 
     /**
-     * Gets or sets the verification number
-     * @param null $vn
-     * @return $this|null|string
+     * Generate a random valid RUT, useful for seeders, factories and tests.
      */
-    public function vn($vn = null)
+    public static function random(int $min = 1000000, int $max = 25999999): static
+    {
+        return static::set(random_int($min, $max))->fix();
+    }
+
+    /**
+     * Gets or sets the verification number.
+     */
+    public function vn(string|int|null $vn = null): static|string|null
     {
         if ($vn !== null) {
-            $this->vn = strtoupper($this->escape($vn));
+            $this->vn = strtoupper($this->escape((string) $vn));
+
             return $this;
         }
+
         return $this->vn;
     }
 
     /**
-     * Get or sets the RUT Number
-     * @param $number
-     * @return $this|int
+     * Gets or sets the RUT number (without the verification number).
      */
-    public function number($number = null)
+    public function number(string|int|null $number = null): static|string|null
     {
         if ($number !== null) {
-            $this->number = $this->escape($number);
+            $this->number = $this->escape((string) $number);
+
             return $this;
         }
+
         return $this->number;
     }
 
     /**
-     * Get or sets the minimum amount of characters a RUT can have to ve valid
-     * @param null $minChars
-     * @return $this|int
+     * Gets or sets the minimum amount of characters the number part can have to be valid (exclusive).
      */
-    public function minChars($minChars = null)
+    public function minChars(?int $minChars = null): static|int
     {
         if ($minChars !== null) {
-            $this->minChars= $minChars;
+            $this->minChars = $minChars;
+
             return $this;
         }
+
         return $this->minChars;
     }
 
     /**
-     * Get or sets the scape chars
-     * @param array $chars
-     * @return $this|array
+     * Gets or sets the maximum amount of characters the number part can have to be valid (exclusive).
      */
-    public function scape_chars(?array $chars = null)
+    public function maxChars(?int $maxChars = null): static|int
+    {
+        if ($maxChars !== null) {
+            $this->maxChars = $maxChars;
+
+            return $this;
+        }
+
+        return $this->maxChars;
+    }
+
+    /**
+     * Gets or sets the characters that are stripped from the RUT before validating.
+     *
+     * @param  string[]|null  $chars
+     * @return static|string[]
+     */
+    public function escapeChars(?array $chars = null): static|array
     {
         if ($chars !== null) {
             $this->escapeChars = $chars;
+
             return $this;
         }
+
         return $this->escapeChars;
     }
 
     /**
-     * Get or sets the verification number separator
-     * @param array|null $vnSeparator
-     * @return $this|string
+     * Alias of escapeChars(), kept for backwards compatibility.
+     *
+     * @deprecated Use escapeChars() instead.
+     *
+     * @param  string[]|null  $chars
+     * @return static|string[]
      */
-    public function vnSeparator(?array $vnSeparator = null)
+    public function scape_chars(?array $chars = null): static|array
+    {
+        return $this->escapeChars($chars);
+    }
+
+    /**
+     * Gets or sets the verification number separator.
+     */
+    public function vnSeparator(?string $vnSeparator = null): static|string
     {
         if ($vnSeparator !== null) {
             $this->vnSeparator = $vnSeparator;
+
             return $this;
         }
+
         return $this->vnSeparator;
     }
 
     /**
-     * Check if the $rut argument is a valid RUT
+     * Check if the RUT is valid.
      *
-     * Devuelve true si el parámetro $rut es válido
+     * Devuelve true si el RUT es válido.
      *
-     * @return bool
      * @throws InvalidFormatException
      */
-    public function isValid()
+    public function isValid(): bool
     {
-        if (!$this->hasValidFormat()) {
+        if (! $this->hasValidFormat()) {
             if ($this->useExceptions) {
                 throw new InvalidFormatException("R.U.T. '{$this->number}' with verification code '{$this->vn}' has an invalid format");
             }
+
             return false;
         }
 
-        $vn_has_to_be = $this->calculateVerificationNumber();
-        if ($this->vn == $vn_has_to_be) {
-            return true;
-        };
-
-        return false;
+        return $this->vn === $this->calculateVerificationNumber();
     }
 
     /**
-     * Alias of isValid($rut,$vn);
+     * Alias of isValid().
      *
-     * @param $rut
-     * @param  $vn
-     * @return bool
      * @throws InvalidFormatException
      */
-    public function validate()
+    public function validate(): bool
     {
         return $this->isValid();
     }
 
     /**
-     * Calculate the verification number based on  a R.U.T. number $this->rut ($this->number())
+     * Calculate the verification number for the current RUT number.
      *
-     * Devuelve el dígito verificador que debe tener el $rut ingresado.
-     * Si quieres pasarle el RUT completo, puedes 'setear' el último
-     * parámetro como true para que la función lo haga por ti
-     * Fuente: http://www.dcc.uchile.cl/~mortega/microcodigos/validarrut/php.php*
+     * Devuelve el dígito verificador que debe tener el RUT ingresado.
+     * Fuente: http://www.dcc.uchile.cl/~mortega/microcodigos/validarrut/php.php
+     *
      * @author Luis Dujovne
-     *
-     *
-     * @return string
      */
-    public function calculateVerificationNumber()
+    public function calculateVerificationNumber(): string
     {
-        $rut = $this->number;
-        $s=1;
-        for ($m=0; $rut != 0; $rut /= 10) {
-            $s=($s+(int)$rut % 10 * (9-$m++%6))%11;
+        $rut = (int) $this->number;
+        $s = 1;
+        for ($m = 0; $rut != 0; $rut = intdiv($rut, 10)) {
+            $s = ($s + $rut % 10 * (9 - $m++ % 6)) % 11;
         }
-        return chr($s?$s+47:75);
+
+        return $s ? chr($s + 47) : 'K';
     }
 
     /**
-     * Splits the rut into rut and verification number.
+     * Splits the RUT into number and verification number.
      *
-     * Si no le pasas el $vn digito verificador, separa el rut del dígito verificador.
-     * Si le pasas el $vn digito verificador te devuelve ambos parámetros como array.
+     * Si no le pasas el dígito verificador $vn, separa el rut del dígito verificador.
+     * Si le pasas el dígito verificador $vn, te devuelve ambos parámetros como array.
      *
-     * @param $rut
-     * @param null $vn
-     * @return array [$rut,$vn]
+     * @return array{0: string, 1: string}
      */
-    public static function split($rut, $vn = null)
+    public static function split(string|int $rut, string|int|null $vn = null): array
     {
-        if (!is_null($vn)) {
-            return [$rut, $vn];
+        $rut = (string) $rut;
+
+        if ($vn !== null) {
+            return [$rut, (string) $vn];
         }
-        $vn = (substr($rut, -1));//Get the last character
-        $rut = substr($rut, 0, -1); //Remove tha last char from the rut
 
-        return [$rut, $vn];
+        return [substr($rut, 0, -1), substr($rut, -1)];
     }
+
     /**
-     * Escape the RUT or any string. Remove the $scape_chars of the string.
+     * Escape the RUT or any string, removing the escapeChars() characters.
      *
-     * Quita los caracteres ($scape_chars) que no queremos del RUT/String
-     *
-     * @param string $string
-     * @return string
+     * Quita los caracteres (escapeChars) que no queremos del RUT/string.
      */
-
-    public function escape($string)
+    public function escape(string $string): string
     {
-        return str_replace($this->scape_chars(), "", $string);
+        return str_replace($this->escapeChars, '', $string);
     }
 
     /**
-     * Get the normalized version of the RUT.
-     * @return string
+     * Get the normalized version of the RUT. Ex: '123456785'.
+     *
      * @throws InvalidFormatException
      */
-    public function normalize()
+    public function normalize(): string|false
     {
-        return $this->format(self::FORMAT_ESCAPED);
+        return $this->format(RutFormat::Escaped);
     }
 
     /**
-     * Fix the RUT, so the verification number is now valid. This method overrides the verification number provided
-     *
-     * @return $this
+     * Fix the RUT so the verification number is now valid.
+     * This method overrides the verification number provided.
      */
-    public function fix()
+    public function fix(): static
     {
         $this->vn($this->calculateVerificationNumber());
+
         return $this;
     }
 
     /**
-     * Format R.U.T
+     * Format the RUT in one of the available formats.
      *
-     * Formatea el RUt en alguno de los 3 formatos disponibles.
+     * Formatea el RUT en alguno de los 3 formatos disponibles.
+     * Returns false when the RUT has an invalid format and exceptions are disabled.
      *
-     * @param int $format
-     * @return string
      * @throws InvalidFormatException
      */
-    public function format($format = self::FORMAT_COMPLETE)
+    public function format(RutFormat|int $format = RutFormat::Complete): string|false
     {
-        if (!$this->hasValidFormat()) {
+        if (! $this->hasValidFormat()) {
+            if ($this->useExceptions) {
+                throw new InvalidFormatException("R.U.T. '{$this->number}' with verification code '{$this->vn}' has an invalid format");
+            }
+
             return false;
         }
-        switch ($format) {
-            case static::FORMAT_COMPLETE:
-                return $this->join(
-                    number_format($this->number, 0, null, "."),
-                    $this->vn
-                );
-                break;
 
-            case static::FORMAT_WITH_DASH:
-                return $this->join($this->number, $this->vn);
-                break;
+        if (is_int($format)) {
+            $format = RutFormat::from($format);
         }
-        return $this->number . $this->vn;
+
+        return match ($format) {
+            RutFormat::Complete => $this->join(
+                number_format((float) $this->number, 0, '', '.'),
+                $this->vn
+            ),
+            RutFormat::WithDash => $this->join($this->number, $this->vn),
+            RutFormat::Escaped => $this->number.$this->vn,
+        };
     }
 
     /**
-     * Check if RUT has a valid format. If not, throws an Exception
+     * Check if the RUT has a valid format (it does not verify the verification number).
      *
-     * REvisa si el R.U.T. tiene un formato válido. De ser inválido, arroja una excepción o returna false si $use_exections = true;
-     *
-     * @param $rut
-     * @param null $vn
-     * @throws \Freshwork\ChileanBundle\Exceptions\InvalidFormatException
-     *
-     * @return bool
+     * Revisa si el RUT tiene un formato válido.
      */
-    public function hasValidFormat()
+    public function hasValidFormat(): bool
     {
-        if (strlen($this->number) >= $this->maxChars) {
+        $number = (string) $this->number;
+
+        if (strlen($number) >= $this->maxChars || strlen($number) <= $this->minChars) {
             return false;
         }
 
-        if (strlen($this->number) <= $this->minChars) {
+        if (! preg_match('/^[K0-9]$/', (string) $this->vn)) {
             return false;
         }
 
-        if (!preg_match('/([K0-9])$/', $this->vn)) {
-            return false;
-        }
-
-        if (!preg_match('/^[0-9]+$/', $this->number)) {
-            return false;
-        }
-
-        return true;
+        return (bool) preg_match('/^[0-9]+$/', $number);
     }
 
     /**
-     * Join two parts of a RUT. Rut and verification number.
-     * @param null|string $str1 (optional)
-     * @param null|string $str2 (optional)
-     *
-     * @return string
+     * Join two parts of a RUT: number and verification number.
      */
-    public function join($str1 = null, $str2 = null)
+    public function join(?string $number = null, ?string $vn = null): string
     {
-        if (is_null($str1)) {
-            $str1 = $this->number();
-        }
-        if (is_null($str2)) {
-            $str2 = $this->vn();
-        }
-
-        return $str1 . $this->vnSeparator . $str2;
+        return ($number ?? $this->number).$this->vnSeparator.($vn ?? $this->vn);
     }
 
-
     /**
-     * Set the object to a quiet status, without throwing exceptions
-     *
-     * @return $this
+     * Set the object to a quiet status: validation failures return false instead of throwing.
      */
-    public function quiet()
+    public function quiet(): static
     {
         $this->useExceptions = false;
+
         return $this;
     }
 
     /**
-     * Let the object throw exception on validation failures
-     *
-     * @return $this
+     * Let the object throw exceptions on validation failures.
      */
-    public function use_exceptions()
+    public function use_exceptions(): static
     {
         $this->useExceptions = true;
+
         return $this;
     }
 
     /**
-     * Return exceptions throwing status
-     * @return bool
+     * Return exception-throwing status.
      */
-    public function is_using_exceptions()
+    public function is_using_exceptions(): bool
     {
         return $this->useExceptions;
     }
 
     /**
-     * @return array
+     * @return array{0: string|null, 1: string|null}
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [$this->number, $this->vn];
     }
 
-    /**
-     * @return string
-     * @throws InvalidFormatException
-     */
-    public function __toString()
+    public function jsonSerialize(): mixed
     {
-        return $this->format();
+        return $this->format() ?: null;
+    }
+
+    public function __toString(): string
+    {
+        return $this->format() ?: '';
     }
 }

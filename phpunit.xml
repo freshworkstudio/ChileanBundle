@@ -6,7 +6,10 @@
 >
     <testsuites>
         <testsuite name="Unit">
-            <directory>tests/Unit</directory> 
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Laravel">
+            <directory>tests/Laravel</directory>
         </testsuite>
     </testsuites>
     <source>
@@ -14,7 +17,4 @@
             <directory>src</directory>
         </include>
     </source>
-    <php>
-      
-    </php>
 </phpunit>
