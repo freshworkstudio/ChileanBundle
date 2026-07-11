@@ -332,7 +332,7 @@ class Rut implements JsonSerializable, Stringable
 
         return match ($format) {
             RutFormat::Complete => $this->join(
-                number_format((float) $this->number, 0, '', '.'),
+                (string) preg_replace('/\B(?=(\d{3})+(?!\d))/', '.', (string) $this->number),
                 $this->vn
             ),
             RutFormat::WithDash => $this->join($this->number, $this->vn),

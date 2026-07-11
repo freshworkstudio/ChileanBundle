@@ -139,6 +139,12 @@ it('respects min and max chars boundaries', function () {
     expect(Rut::parse('1.234.567.890-1')->quiet()->validate())->toBeFalse(); // 10 digits >= maxChars
 });
 
+it('preserves leading zeros when formatting', function () {
+    expect(Rut::set('01234567')->fix()->format(RutFormat::Complete))->toBe('01.234.567-4');
+    expect(Rut::set('01234567')->fix()->format(RutFormat::WithDash))->toBe('01234567-4');
+    expect(Rut::set('01234567')->fix()->normalize())->toBe('012345674');
+});
+
 it('rejects verification numbers longer than one character', function () {
     expect(Rut::set('12345678', 'XK')->quiet()->validate())->toBeFalse();
 });

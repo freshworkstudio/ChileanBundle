@@ -56,7 +56,7 @@ class RutCast implements CastsAttributes
             return null;
         }
 
-        $rut = $value instanceof Rut ? $value : Rut::parse((string) $value);
+        $rut = $value instanceof Rut ? clone $value : Rut::parse((string) $value);
 
         return ($formatted = $rut->quiet()->format($this->format)) === false
             ? (string) $value

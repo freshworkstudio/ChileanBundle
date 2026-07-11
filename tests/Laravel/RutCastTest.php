@@ -52,6 +52,14 @@ it('accepts a Rut object when setting', function () {
     expect($model->getAttributes()['rut'])->toBe('123456785');
 });
 
+it('does not mutate the original Rut object when setting', function () {
+    $rut = Rut::parse('12.345.678-5');
+    $model = makeCastModel(RutCast::class);
+    $model->rut = $rut;
+
+    expect($rut->is_using_exceptions())->toBeTrue();
+});
+
 it('keeps the raw value when the rut is not formattable', function () {
     $model = makeCastModel(RutCast::class);
     $model->rut = 'invalid';
